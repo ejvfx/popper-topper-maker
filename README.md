@@ -99,14 +99,18 @@ The layer order is cab, flyer, game logo, manufacturer, year. A missing entry me
 
 ## Sharing toppers
 
-`Export-ToppersForSharing.ps1` copies the generated toppers to a share folder, `Topper_Share`, with names trimmed to the base table. Everything after the last `(Manufacturer Year)` is dropped:
+`Export-ToppersForSharing.ps1` copies the generated toppers from `Topper_Generated` and `Topper_Generated_Half` to a share folder, with names trimmed to the base table. Each video goes into a subfolder named after its actual resolution, read with ffprobe: `Topper_Share\1540x720\` or `Topper_Share\1920x540\`.
+
+The resolution is in the folder name, not the filename, because Popper matches media by exact game name. Shared files can be dropped straight into a `Topper` folder without renaming.
+
+Everything after the last `(Manufacturer Year)` is dropped from the name:
 
 | Generated name | Shared name |
 |---|---|
 | `Super Straight (Sonic 1977) v600.mp4` | `Super Straight (Sonic 1977).mp4` |
 | `Medieval Madness (Williams 1997) VPW 1.2.mp4` | `Medieval Madness (Williams 1997).mp4` |
 
-The files in `Topper_Generated` are never modified. If several versions of a table trim to the same name, the newest one is kept and the others are listed as skipped. Names without a `(Manufacturer Year)` are copied unchanged and listed.
+The files in `Topper_Generated` are never modified. If several versions of a table trim to the same name at the same resolution, the newest one is kept and the others are listed as skipped. Names without a `(Manufacturer Year)` are copied unchanged and listed.
 
 Preview the renames without copying anything:
 
