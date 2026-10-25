@@ -1,6 +1,11 @@
 # Make-ToppersFromArt
 
-A PowerShell script that batch-generates topper videos for PinUP Popper from media you already have. It uses ffmpeg to composite each table's playfield video, cab art, flyer and logos into a looping 1540x720 video.
+A PowerShell script that batch-generates topper videos for PinUP Popper from media you already have. It uses ffmpeg to composite each table's playfield video, cab art, flyer and logos into a looping topper video, in one of two sizes:
+
+| Mode | Size | Output folder |
+|---|---|---|
+| `Full` (default) | 1540x720 | `Topper_Generated` |
+| `Half` | 1920x540 | `Topper_Generated_Half` |
 
 ## What it builds
 
@@ -39,7 +44,7 @@ All paths are set in the `CONFIG` block at the top of the script.
 | `$logoDir` | `POPMedia\Visual Pinball X\Logo` | Game logos, ideally transparent PNGs |
 | `$wheelDir` | `POPMedia\Visual Pinball X\Wheel` | Wheel images, used as fallback art |
 | `$mfrLogoDir` | `<script folder>\ManufacturerLogos` | Manufacturer logos (optional) |
-| `$outDir` | `POPMedia\Visual Pinball X\Topper_Generated` | Output videos |
+| Output | `POPMedia\Visual Pinball X\Topper_Generated` (Half mode: `Topper_Generated_Half`) | Output videos. Set per mode in `$modes`. |
 
 Images can be `.png`, `.jpg`, `.jpeg`, `.bmp` or `.webp`. Each file must be named exactly like the playfield video, minus the extension. For example:
 
@@ -60,6 +65,12 @@ Run from the folder containing the script, for example `C:\Scripts`.
 
 ```
 powershell -ExecutionPolicy Bypass -File .\Make-ToppersFromArt.ps1 -Game "Aliens (Original 2020)"
+```
+
+**Half-height toppers.** Add `-Mode Half` to any command:
+
+```
+powershell -ExecutionPolicy Bypass -File .\Make-ToppersFromArt.ps1 -Mode Half
 ```
 
 **Build all tables.** A full run skips any table that already has an output file.
@@ -147,11 +158,11 @@ Logos are often centered on a large transparent canvas, such as 1500x1500. The s
 
 ## Settings
 
-All settings are in the `CONFIG` block.
+All settings are in the `CONFIG` block. Pixel sizes are designed for a 720 px tall frame and scale automatically with the mode's height. In Half mode (540 px) they are multiplied by 0.75. The defaults below are the 720 px values.
 
 | Setting | Default | Effect |
 |---|---|---|
-| `$W`, `$H` | 1540, 720 | Output resolution |
+| `$modes` | Full 1540x720, Half 1920x540 | Output size and folder for each mode. Change a mode's size to match your topper monitor. |
 | `$blur` | 8 | Background blur strength |
 | `$pad` | 40 | Distance of cab art and flyer from the frame edges |
 | `$cabBoxW` | 560 | Maximum cab art width. Height is always full frame. |

@@ -6,7 +6,9 @@
 # Missing cab/flyer/logo is skipped gracefully; no playfield video = no output.
 
 param(
-    [string]$Game = ""   # e.g. -Game "Attack from Mars (Bally 1995)" ; blank = all tables
+    [string]$Game = "",   # e.g. -Game "Attack from Mars (Bally 1995)" ; blank = all tables
+    [ValidateSet("Full", "Half")]
+    [string]$Mode = "Full"  # Full = full-height topper, Half = half-height topper (see $modes)
 )
 
 # ---------- CONFIG ----------
@@ -18,12 +20,18 @@ $cabDir    = "$media\DMD"        # cab art
 $flyerDir  = "$media\GameInfo"   # flyers
 $logoDir   = "$media\Logo"       # logos
 $wheelDir  = "$media\Wheel"      # wheel images (fallback when cab art or flyer is missing)
-$outDir    = "$media\Topper_Generated"   # review before copying into Topper
 
 $mfrLogoDir = "$PSScriptRoot\ManufacturerLogos"   # optional: Williams.png, Bally.png, Stern.png ... (falls back to text)
 
-$W = 1540; $H = 720
-$pad      = 40                 # side padding for cab art / flyer
+# Output size per mode. Layout values below are designed at 720 px tall and scale with the mode's height.
+$modes = @{
+    Full = @{ W = 1540; H = 720; out = "Topper_Generated" }
+    Half = @{ W = 1920; H = 540; out = "Topper_Generated_Half" }
+}
+$W = $modes[$Mode].W; $H = $modes[$Mode].H
+$outDir = "$media\$($modes[$Mode].out)"
+
+$pad      = 40                # side padding for cab art / flyer
 $cabBoxW  = 560                # cab art: full height, bottom-justified, max this wide
 $cabFillHoles = $true          # fill see-through dark areas inside the cab silhouette with black
 $cabMaskClose = 3              # gap-sealing passes for the fill (raise if the background leaks in)
@@ -48,6 +56,14 @@ $textOutline   = 3             # thin dark outline in px (0 = off)
 $tmpDir       = Join-Path $env:TEMP "toppers"
 $overwrite = [bool]$Game   # single-game test runs always rebuild; full runs skip existing
 # ----------------------------
+
+# Scale the 720-px layout to this mode's height
+$k = $H / 720
+function S($v) { [int][math]::Round($v * $k) }
+$pad = S $pad; $cabBoxW = S $cabBoxW; $sideBoxW = S $sideBoxW; $sideBoxH = S $sideBoxH; $flyerH = S $flyerH
+$logoBoxW = S $logoBoxW; $logoBoxH = S $logoBoxH; $mfrFontSize = S $mfrFontSize; $yearFontSize = S $yearFontSize
+$shadowOffset = S $shadowOffset; $textOutline = S $textOutline
+$blur = $blur * $k; $shadowBlur = $shadowBlur * $k
 
 $imgExt = @(".png", ".jpg", ".jpeg", ".bmp", ".webp")
 New-Item -ItemType Directory -Force -Path $outDir, $tmpDir | Out-Null
@@ -108,7 +124,7 @@ $pfFiles | ForEach-Object {
     if ((Test-Path -LiteralPath $out) -and -not $overwrite) { Write-Host "skip (exists): $name"; return }
 
     $inputs = @("-i", $_.FullName)
-    $fc = "[0:v]transpose=1,scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},gblur=sigma=$blur,setsar=1[v0]"
+    $fc = "[0:v]transpose=1,scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},gblur=sigma=$(N $blur),setsar=1[v0]"
     $last = "v0"; $idx = 1
 
     $layers = @(
