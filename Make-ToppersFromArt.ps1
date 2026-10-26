@@ -25,9 +25,10 @@ $mfrLogoDir = "$PSScriptRoot\ManufacturerLogos"   # optional: Williams.png, Ball
 
 # Output size per mode. Layout values below are designed at 720 px tall and scale with the mode's height.
 $modes = @{
-    Full = @{ W = 1540; H = 720; out = "Topper_Generated" }
-    Half = @{ W = 1920; H = 540; out = "Topper_Generated_Half" }
+    Full = @{ W = 1540; H = 720; inset = 0;   out = "Topper_Generated" }
+    Half = @{ W = 1920; H = 540; inset = 200; out = "Topper_Generated_Half" }
 }
+# inset = extra px (at output size) moving cab art and flyer in from the edges toward the center
 $W = $modes[$Mode].W; $H = $modes[$Mode].H
 $outDir = "$media\$($modes[$Mode].out)"
 
@@ -60,7 +61,7 @@ $overwrite = [bool]$Game   # single-game test runs always rebuild; full runs ski
 # Scale the 720-px layout to this mode's height
 $k = $H / 720
 function S($v) { [int][math]::Round($v * $k) }
-$pad = S $pad; $cabBoxW = S $cabBoxW; $sideBoxW = S $sideBoxW; $sideBoxH = S $sideBoxH; $flyerH = S $flyerH
+$pad = (S $pad) + $modes[$Mode].inset; $cabBoxW = S $cabBoxW; $sideBoxW = S $sideBoxW; $sideBoxH = S $sideBoxH; $flyerH = S $flyerH
 $logoBoxW = S $logoBoxW; $logoBoxH = S $logoBoxH; $mfrFontSize = S $mfrFontSize; $yearFontSize = S $yearFontSize
 $shadowOffset = S $shadowOffset; $textOutline = S $textOutline
 $blur = $blur * $k; $shadowBlur = $shadowBlur * $k

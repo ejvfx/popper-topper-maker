@@ -167,6 +167,7 @@ All settings are in the `CONFIG` block. Pixel sizes are designed for a 720 px ta
 | Setting | Default | Effect |
 |---|---|---|
 | `$modes` | Full 1540x720, Half 1920x540 | Output size and folder for each mode. Change a mode's size to match your topper monitor. |
+| `inset` (in `$modes`) | Full 0, Half 200 | Extra px moving the cab art and flyer in from the edges toward the center |
 | `$blur` | 8 | Background blur strength |
 | `$pad` | 40 | Distance of cab art and flyer from the frame edges |
 | `$cabBoxW` | 560 | Maximum cab art width. Height is always full frame. |
